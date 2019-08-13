@@ -266,6 +266,9 @@ class MoIP_Transmitter:
     def name(self):
         return self._name
 
+    def str(self):
+        return "self._name (Tx#%s)" % (self._num)
+    
     def __repr__(self):
         return "{MoIP Tx#%d \"%s\"}" % (self._num,
                                         self._name)
