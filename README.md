@@ -1,4 +1,4 @@
-pybinarymoip 0.0.1
+pybinarymoip 0.0.2
 ==================
 A simple Python library for controlling a SnapAV(tm) Binary(tm)-brand
 Media-Over-IP (MOIP(tm)) device for streaming video matrix-style
