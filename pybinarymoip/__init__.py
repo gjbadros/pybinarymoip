@@ -246,10 +246,16 @@ class MoIP_Receiver(object):
     def set_cec(self, cec_on):
         self._send_check("!CEC=%s,%d" % (self._num, 1 if cec_on else 0))
 
-    def __repr__(self):
+    def __str__(self):
         return "{MoIP Rx#%d \"%s\" from %s}" % (self._num,
                                                 self._name,
                                                 self._input)
+
+    def __repr__(self):
+        return str({'name': self._name,
+                    'num': self._num,
+                    'input': self._input.num,
+                    'mc': self._mc})
 
 
 class MoIP_Transmitter(object):
@@ -266,9 +272,11 @@ class MoIP_Transmitter(object):
     def name(self):
         return self._name
 
-    def str(self):
-        return "self._name (Tx#%s)" % (self._num)
-    
-    def __repr__(self):
+    def __str__(self):
         return "{MoIP Tx#%d \"%s\"}" % (self._num,
                                         self._name)
+
+    def __repr__(self):
+        return str({'name': self._name,
+                    'num': self._num,
+                    'mc': self._mc})

@@ -1,15 +1,15 @@
 from distutils.core import setup
 
 setup(
-    name = 'pybinarymoip',
-    version = '0.0.2',
-    license = 'MIT',
-    description = 'Python library for Binary Media over IP (MOIP), used for Home Assistant',
-    author = 'Greg J. Badros',
-    author_email = 'badros@gmail.com',
-    url = 'http://github.com/gjbadros/pywattbox',
+    name='pybinarymoip',
+    version='0.0.3',
+    license='MIT',
+    description='Python library for Binary Media over IP (MOIP), used for Home Assistant',
+    author='Greg J. Badros',
+    author_email='badros@gmail.com',
+    url='http://github.com/gjbadros/pybinarymoip',
     packages=['pybinarymoip'],
-    classifiers = [
+    classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
