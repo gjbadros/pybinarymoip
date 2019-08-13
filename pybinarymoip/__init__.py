@@ -194,6 +194,15 @@ class MoIP(object):
     def _update(self, xml_str=None):
         pass
 
+    def __str__(self):
+        return "MoIP Controller @ %s [%s]" % (
+            self._host,
+            self._firmware_version)
+
+    def __repr__(self):
+        return str({'host': self._host,
+                    'firmware_version': self._firmware_version})
+
 
 class MoIP_Receiver(object):
     def __init__(self, mc, num, name, input=None):
