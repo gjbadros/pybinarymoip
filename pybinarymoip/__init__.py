@@ -21,7 +21,6 @@ import logging
 import socket
 import select
 import re
-import requests
 
 # urllib.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _LOGGER = logging.getLogger(__name__)
@@ -263,7 +262,7 @@ class MoIP_Receiver(object):
     def __repr__(self):
         return str({'name': self._name,
                     'num': self._num,
-                    'input': self._input.num,
+                    'input': self._input and self._input.num,
                     'mc': self._mc})
 
 
