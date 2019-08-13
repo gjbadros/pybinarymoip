@@ -195,7 +195,7 @@ class MoIP(object):
         pass
 
 
-class MoIP_Receiver:
+class MoIP_Receiver(object):
     def __init__(self, mc, num, name, input=None):
         self._mc = mc
         self._num = num
@@ -252,7 +252,7 @@ class MoIP_Receiver:
                                                 self._input)
 
 
-class MoIP_Transmitter:
+class MoIP_Transmitter(object):
     def __init__(self, mc, num, name):
         self._mc = mc
         self._num = num
