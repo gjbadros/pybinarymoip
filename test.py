@@ -12,6 +12,7 @@ MOIP_PASSWORD - password for that user
 """
 
 import logging
+import json
 from os import environ
 from pybinarymoip import MoIP
 
@@ -25,4 +26,10 @@ m = MoIP(environ['MOIP_HOSTNAME'],
 m.connect()
 m.receivers[1].set_resolution(3)
 m.receivers[1].switch_to_tx(m.transmitters[0])
+print(m.transmitters)
 print(m.receivers)
+
+
+#print(json.dumps(m.transmitters[0]))
+#print(json.dumps(m.receivers[0]))
+#print(json.dumps(m))

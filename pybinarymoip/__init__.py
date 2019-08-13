@@ -16,11 +16,9 @@ mention this dependency.)
 __Author__ = "Greg J. Badros <badros@gmail.com>"
 __copyright__ = "Copyright 2019, Greg J. Badros"
 
-from time import (localtime, mktime)
 import logging
 import socket
 import select
-import re
 
 # urllib.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _LOGGER = logging.getLogger(__name__)
@@ -32,26 +30,6 @@ class MoIP(object):
     This object owns the connection to the MoIP controller,
     reading status, and issuing state changes.
     """
-
-    def parse(self, xml_str):
-        """Main entrypoint into the parser. It gets the state of the strip."""
-
-        import xml.etree.ElementTree as ET
-
-        root = ET.fromstring(xml_str)
-        self._hostname = root.find('host_name').text
-        self._hardware_version = root.find('hardware_version').text
-        self._serial_number = root.find('serial_number').text
-        self._has_ups = root.find('hasUPS').text == '1'
-        self._voltage = int(root.find('voltage_value').text)/10
-        self._current = int(root.find('current_value').text)/10
-        self._power = int(root.find('power_value').text)
-        self._cloud_status = root.find('cloud_status').text == '1'
-        outlet_names = root.find('outlet_name').text.split(',')
-        outlet_status = root.find('outlet_status').text.split(',')
-        for (i, (name, state)) in enumerate(zip(outlet_names, outlet_status)):
-            self._switches.append(Switch(self, i, name, state == '1'))
-        return True
 
     # pylint: disable=too-many-instance-attributes, too-many-arguments
     def __init__(self, host, username, password, area='',
