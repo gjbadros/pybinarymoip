@@ -66,7 +66,7 @@ class MoIP(object):
                          self._firmware_version)
             self._send("?Devices\n")
             devices = self._read_after_equals()
-            (tx, rx) = devices.split(",", 2)
+            (tx, rx) = devices.split(",", 1)
             (num_tx, num_rx) = (int(tx), int(rx))
             _LOGGER.info("# Transmitters = %s, # Receivers = %s",
                          num_tx, num_rx)
@@ -77,8 +77,8 @@ class MoIP(object):
 
             num = 1
             for rl in rx_lines[0:len(rx_lines)-1]:
-                (_, a) = rl.split("=", 2)
-                (_, _, name) = a.split(",", 3)
+                (_, a) = rl.split("=", 1)
+                (_, _, name) = a.split(",", 2)
                 self._receivers.append(MoIP_Receiver(self, num, name))
                 num += 1
 
@@ -88,8 +88,8 @@ class MoIP(object):
 
             num = 1
             for tl in tx_lines[0:len(tx_lines)-1]:
-                (_, a) = tl.split("=", 2)
-                (_, _, name) = a.split(",", 3)
+                (_, a) = tl.split("=", 1)
+                (_, _, name) = a.split(",", 2)
                 self._transmitters.append(MoIP_Transmitter(self, num, name))
                 num += 1
 
@@ -104,7 +104,7 @@ class MoIP(object):
         answer = self._read_after_equals()
         inputs = answer.split(",")
         for i in inputs:
-            (tx, rx) = i.split(":")
+            (tx, rx) = i.split(":",1)
             tx_obj = self._transmitters[int(tx)-1]
             self._receivers[int(rx)-1]._set_input(tx_obj)
 
@@ -156,7 +156,7 @@ class MoIP(object):
 
     def _read_after_equals(self):
         answer = self._read()
-        return answer.split("=", 2)[1]
+        return answer.split("=", 1)[1]
 
     @property
     def receivers(self):
