@@ -100,11 +100,15 @@ class MoIP(object):
             _LOGGER.error("Failed to initialize connection: %s", err)
 
     def _update_inputs(self):
+        extra_text = self._read_full()
+        if extra_text:
+            _LOGGER.warning("Ignoring extra text: %s", extra_text)
+        _LOGGER.warning
         self._send("?Receivers\n")
         answer = self._read_after_equals()
         inputs = answer.split(",")
         for i in inputs:
-            (tx, rx) = i.split(":",1)
+            (tx, rx) = i.split(":", 1)
             tx_obj = self._transmitters[int(tx)-1]
             self._receivers[int(rx)-1]._set_input(tx_obj)
 
@@ -112,10 +116,10 @@ class MoIP(object):
         self._last_send = str
         self._sock.send(str.encode())
 
-    def _send_check(self, str):
+    def _send_check(self, str, timeout):
         """Appends newline to str before sending, confirms OK response."""
         self._send(str + "\n")
-        response = self._read()
+        response = self._read(timeout)
         _LOGGER.debug("sent '%s', got response = %s", str, response)
         if response != "OK":
             _LOGGER.error("Sent '%s' and got error response: %s",
@@ -131,8 +135,8 @@ class MoIP(object):
         answer = self._sock.recv(16384).decode()
         return answer
 
-    def _read(self):
-        answer = self._read_raw()
+    def _read(self, timeout=None):
+        answer = self._read_raw(timeout)
         if not answer:
             _LOGGER.warning(
                 "Timeout (%s second(s)) waiting for a response after "
@@ -204,14 +208,14 @@ class MoIP_Receiver(object):
     def _set_input(self, input):
         self._input = input
 
-    def _send_check(self, str):
-        return self._mc._send_check(str)
+    def _send_check(self, str, timeout):
+        return self._mc._send_check(str, timeout)
 
     def switch_to_tx(self, tx):
         if not isinstance(tx, int):
             tx = tx.num
         self._send_check("!Switch=%s,%s" %
-                         (tx, self._num))
+                         (tx, self._num), 5)
         self._mc._update_inputs()
 
     def set_resolution(self, resolution):
