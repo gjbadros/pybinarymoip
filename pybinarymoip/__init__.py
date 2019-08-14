@@ -200,6 +200,7 @@ class MoIP_Receiver(object):
     def input(self):
         return self._input
 
+    # input is a Tx object (which has a .num property)
     def _set_input(self, input):
         self._input = input
 
@@ -240,7 +241,8 @@ class MoIP_Receiver(object):
     def __repr__(self):
         return str({'name': self._name,
                     'num': self._num,
-                    'input': self._input and self._input.num,
+                    'input': self._input,
+                    'input_num': self._input and self._input.num,
                     'mc': self._mc})
 
 
