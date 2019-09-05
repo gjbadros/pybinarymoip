@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='pybinarymoip',
-    version='0.0.5',
+    version='0.0.6',
     license='MIT',
     description='Python library for Binary Media over IP (MOIP), used for Home Assistant',
     author='Greg J. Badros',
