@@ -19,6 +19,7 @@ __copyright__ = "Copyright 2019, Greg J. Badros"
 import logging
 import socket
 import select
+import threading
 
 # urllib.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _LOGGER = logging.getLogger(__name__)
@@ -44,7 +45,8 @@ class MoIP(object):
         self._transmitters = []
         self._devices = []
         self._sock = None
-        self._timeout = 3
+        self._timeout = 8
+        self._socket_lock = threading.Lock()
 
     def connect(self):
         """Begin connection to the device and get its status."""
@@ -100,17 +102,18 @@ class MoIP(object):
             _LOGGER.error("Failed to initialize connection: %s", err)
 
     def _update_inputs(self):
-        extra_text = self._read_full()
-        if extra_text:
-            _LOGGER.warning("Ignoring extra text: %s", extra_text)
-        _LOGGER.warning
-        self._send("?Receivers\n")
-        answer = self._read_after_equals()
-        inputs = answer.split(",")
-        for i in inputs:
-            (tx, rx) = i.split(":", 1)
-            tx_obj = self._transmitters[int(tx)-1]
-            self._receivers[int(rx)-1]._set_input(tx_obj)
+        with self._socket_lock:
+            extra_text = self._read_full()
+            if extra_text:
+                _LOGGER.warning("Ignoring extra text: %s", extra_text)
+            _LOGGER.warning
+            self._send("?Receivers\n")
+            answer = self._read_after_equals()
+            inputs = answer.split(",")
+            for i in inputs:
+                (tx, rx) = i.split(":", 1)
+                tx_obj = self._transmitters[int(tx)-1]
+                self._receivers[int(rx)-1]._set_input(tx_obj)
 
     def _send(self, str):
         self._last_send = str
@@ -118,12 +121,13 @@ class MoIP(object):
 
     def _send_check(self, str, timeout):
         """Appends newline to str before sending, confirms OK response."""
-        self._send(str + "\n")
-        response = self._read(timeout)
-        _LOGGER.debug("sent '%s', got response = %s", str, response)
-        if response != "OK":
-            _LOGGER.error("Sent '%s' and got error response: %s",
-                          str, response)
+        with self._socket_lock:
+            self._send(str + "\n")
+            response = self._read(timeout)
+            _LOGGER.debug("sent '%s', got response = %s", str, response)
+            if response and not response.startswith("OK"):
+                _LOGGER.error("Sent '%s' and got error response: %s",
+                              str, response)
 
     def _read_raw(self, timeout=None):
         if timeout is None:
@@ -208,14 +212,15 @@ class MoIP_Receiver(object):
     def _set_input(self, input):
         self._input = input
 
-    def _send_check(self, str, timeout):
+    def _send_check(self, str, timeout=5):
         return self._mc._send_check(str, timeout)
 
     def switch_to_tx(self, tx):
         if not isinstance(tx, int):
             tx = tx.num
+        self._input = tx
         self._send_check("!Switch=%s,%s" %
-                         (tx, self._num), 5)
+                         (tx, self._num))
         self._mc._update_inputs()
 
     def set_resolution(self, resolution):
@@ -246,7 +251,7 @@ class MoIP_Receiver(object):
         return str({'name': self._name,
                     'num': self._num,
                     'input': self._input,
-                    'input_num': self._input and self._input.num,
+#                    'input_num': self._input and self._input.num,
                     'mc': self._mc})
 
 
