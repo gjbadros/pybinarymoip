@@ -13,6 +13,7 @@ MOIP_PASSWORD - password for that user
 
 import logging
 import json
+import sys
 from os import environ
 from pybinarymoip import MoIP
 
@@ -30,7 +31,15 @@ m.receivers[7].switch_to_tx(m.transmitters[2])
 print(m.transmitters)
 print(m.receivers)
 
+if len(sys.argv) == 2:
+    if sys.argv[1] == "matrix":
+        m.receivers[7].switch_to_tx(m.transmitters[2])
+    elif sys.argv[1] == "separate":
+        m.receivers[1].switch_to_tx(m.transmitters[2])
+        m.receivers[3].switch_to_tx(m.transmitters[2])
+        m.receivers[4].switch_to_tx(m.transmitters[2])
+        m.receivers[5].switch_to_tx(m.transmitters[2])
 
-#print(json.dumps(m.transmitters[0]))
-#print(json.dumps(m.receivers[0]))
-#print(json.dumps(m))
+# print(json.dumps(m.transmitters[0]))
+# print(json.dumps(m.receivers[0]))
+# print(json.dumps(m))

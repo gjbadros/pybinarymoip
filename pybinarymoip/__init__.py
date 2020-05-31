@@ -8,7 +8,7 @@ $ cd .../path/to/home-assistant/
 $ pip3 install --upgrade .../path/to/pybinarymoip
 
 Then the custom_component/pybinarymoip/ and its require line will work.
-(Or just make the custom_component's manifest.json requirements field 
+(Or just make the custom_component's manifest.json requirements field
 mention this dependency.)
 
 """
@@ -101,14 +101,18 @@ class MoIP(object):
         except Exception as err:
             _LOGGER.error("Failed to initialize connection: %s", err)
 
+    # TODO: skip updating again if last update was < ~2 sec ago
     def _update_inputs(self):
         with self._socket_lock:
             extra_text = self._read_full()
             if extra_text:
-                _LOGGER.warning("Ignoring extra text: %s", extra_text)
-            _LOGGER.warning
+                _LOGGER.warning("Ignoring extra text: %r", extra_text)
             self._send("?Receivers\n")
             answer = self._read_after_equals()
+            if answer is None:
+                _LOGGER.error("Got bad response from ?Receivers "
+                              "-- cannot _update_inputs")
+                return
             inputs = answer.split(",")
             for i in inputs:
                 (tx, rx) = i.split(":", 1)
@@ -121,6 +125,8 @@ class MoIP(object):
 
     def _send_check(self, str, timeout):
         """Appends newline to str before sending, confirms OK response."""
+        if timeout is None:
+            timeout = self._timeout
         with self._socket_lock:
             self._send(str + "\n")
             response = self._read(timeout)
@@ -140,6 +146,8 @@ class MoIP(object):
         return answer
 
     def _read(self, timeout=None):
+        if timeout is None:
+            timeout = self._timeout
         answer = self._read_raw(timeout)
         if not answer:
             _LOGGER.warning(
@@ -164,7 +172,11 @@ class MoIP(object):
 
     def _read_after_equals(self):
         answer = self._read()
-        return answer.split("=", 1)[1]
+        split_answer = answer.split("=", 1)
+        if len(split_answer) > 1:
+            return split_answer[1]
+        else:
+            return None
 
     @property
     def receivers(self):
@@ -220,7 +232,7 @@ class MoIP_Receiver(object):
             tx = tx.num
         self._input = tx
         self._send_check("!Switch=%s,%s" %
-                         (tx, self._num))
+                         (tx, self._num), 12)  # long timeout
         self._mc._update_inputs()
 
     def set_resolution(self, resolution):
