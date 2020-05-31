@@ -24,8 +24,9 @@ m = MoIP(environ['MOIP_HOSTNAME'],
          environ['MOIP_USERNAME'],
          environ['MOIP_PASSWORD'])
 m.connect()
-m.receivers[1].set_resolution(3)
+m.receivers[1].set_resolution(0)
 m.receivers[1].switch_to_tx(m.transmitters[0])
+m.receivers[7].switch_to_tx(m.transmitters[2])
 print(m.transmitters)
 print(m.receivers)
 
