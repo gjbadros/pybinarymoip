@@ -204,9 +204,9 @@ class MoIP(object):
 class MoIP_Receiver(object):
     def __init__(self, mc, num, name, input=None):
         self._mc = mc
-        self._num = num
+        self._num = num  # our receiver number
         self._name = name
-        self._input = input
+        self._input = input  # a MoIP_Transmitter object
 
     @property
     def num(self):
@@ -228,11 +228,21 @@ class MoIP_Receiver(object):
         return self._mc._send_check(str, timeout)
 
     def switch_to_tx(self, tx):
-        if not isinstance(tx, int):
-            tx = tx.num
+        """Switch to a given transmitter.
+
+        Can specify either as an integer (0-indexed) or by passing the
+        MoIP_Transmitter object.
+
+        """
+        if isinstance(tx, int):
+            if tx >=0 and tx < len(self._mc._transmitters):
+                tx = self._mc._transmitters[tx]
+            else:
+                _LOGGER.error("tx = %s is out of range", tx)
+                return
         self._input = tx
         self._send_check("!Switch=%s,%s" %
-                         (tx, self._num), 12)  # long timeout
+                         (tx.num, self._num), 12)  # long timeout
         self._mc._update_inputs()
 
     def set_resolution(self, resolution):
@@ -263,7 +273,7 @@ class MoIP_Receiver(object):
         return str({'name': self._name,
                     'num': self._num,
                     'input': self._input,
-#                    'input_num': self._input and self._input.num,
+                    'input_num': self._input and self._input.num,
                     'mc': self._mc})
 
 
