@@ -1,2 +1,14 @@
 test-env
 __pycache__
+lib/
+lib64/
+*.tar.gz
+bin/activate
+bin/activate.csh
+bin/activate.fish
+bin/easy_install
+bin/easy_install-3.7
+bin/pip
+bin/pip3
+bin/pip3.7
+pybinarymoip/__init___flymake.py
